@@ -1,22 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { ChatWindowComponent } from './components/chat-window/chat-window.component';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, ChatWindowComponent],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  imports: [CommonModule],
+  templateUrl: './sidebar.component.html',
+  styleUrls: ['./sidebar.component.css']
 })
-export class AppComponent {
-  title(title: any) {
-    throw new Error('Method not implemented.');
-  }
-  selectedAi: any;
-  
-  
+export class SidebarComponent {
+  @Output() aiSelected = new EventEmitter<any>();
+  @Input() selectedAiId: string | undefined;
+
   ais = [
     { 
       id: 'ai1',
@@ -55,7 +50,7 @@ export class AppComponent {
     },
   ];
 
-  onAiSelected(ai: any) {
-    this.selectedAi = ai;
+  selectAi(ai: any) {
+    this.aiSelected.emit(ai);
   }
 }
