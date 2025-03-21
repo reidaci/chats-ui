@@ -13,4 +13,5 @@
   </div>
   
   <app-chat-window *ngIf="selectedAi" [ai]="selectedAi"></app-chat-window>
+  <app-subscription-banner *ngIf="selectedAi && !isPremiumUser" [show]="true"></app-subscription-banner>
 </div>
