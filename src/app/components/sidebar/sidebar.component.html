@@ -1,5 +1,5 @@
 <div class="sidebar">
-    <div *ngFor="let ai of ais" 
+    <div *ngFor="let ai of availableAis" 
          (click)="selectAi(ai)" 
          class="sidebar-ai-item"
          [class.active]="ai.id === selectedAiId">

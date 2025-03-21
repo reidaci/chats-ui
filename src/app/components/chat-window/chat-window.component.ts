@@ -22,10 +22,9 @@ export class ChatWindowComponent implements OnInit {
   newMessage: string = '';
   isTyping: boolean = false;
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
- 
     this.messages.push({
       text: `Hi there! I'm ${this.ai.name}. How can I help you today?`,
       sender: 'ai',
@@ -35,32 +34,33 @@ export class ChatWindowComponent implements OnInit {
 
   sendMessage() {
     if (this.newMessage.trim()) {
-
       this.messages.push({
         text: this.newMessage,
         sender: 'user',
         timestamp: new Date()
       });
-      
+
       const userMessage = this.newMessage;
       this.newMessage = '';
-      
-  
       this.isTyping = true;
-      
-   
-      this.apiService.sendMessage(userMessage, this.ai.endpoint).subscribe(response => {
-   
+
+      this.apiService.sendMessage(userMessage, this.ai.endpoint).subscribe((response) => {
         this.isTyping = false;
-        
-    
+
+       
+        let aiResponse: string;
+        if (this.ai.endpoint === 'openai') {
+          aiResponse = response.choices[0].message.content;
+        } else {
+          aiResponse = response.response; 
+        }
+
         this.messages.push({
-          text: response.response,
+          text: aiResponse,
           sender: 'ai',
           timestamp: new Date()
         });
-        
-    
+
         setTimeout(() => {
           const messageContainer = document.querySelector('.messages-container');
           if (messageContainer) {

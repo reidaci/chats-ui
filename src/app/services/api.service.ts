@@ -8,34 +8,45 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class ApiService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   sendMessage(message: string, endpoint: string = 'default'): Observable<any> {
-
-    
     if (environment.useMockData) {
-      return this.getMockResponse(message, endpoint).pipe(
-        delay(1000) 
-      );
+      return this.getMockResponse(message, endpoint).pipe(delay(1000));
     }
-    
-   
+
     const apiEndpoint = this.getApiEndpoint(endpoint);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${this.getApiKey(endpoint)}`
     });
-    
-    return this.http.post(apiEndpoint, {
-      messages: [{ role: 'user', content: message }],
-      model: this.getModelName(endpoint),
-      max_tokens: 500
-    }, { headers });
+
+
+    if (endpoint === 'openai') {
+      return this.http.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          messages: [{ role: 'user', content: message }],
+          model: 'gpt-3.5-turbo',
+          max_tokens: 500
+        },
+        { headers }
+      );
+    }
+
+ 
+    return this.http.post(
+      apiEndpoint,
+      {
+        messages: [{ role: 'user', content: message }],
+        model: this.getModelName(endpoint),
+        max_tokens: 500
+      },
+      { headers }
+    );
   }
-  
+
   private getApiEndpoint(endpoint: string): string {
-   
     switch (endpoint) {
       case 'openai':
         return 'https://api.openai.com/v1/chat/completions';
@@ -51,9 +62,8 @@ export class ApiService {
         return 'https://your-backend-api.com/chat';
     }
   }
-  
+
   private getApiKey(endpoint: string): string {
-   
     switch (endpoint) {
       case 'openai':
         return environment.openaiApiKey;
@@ -69,7 +79,7 @@ export class ApiService {
         return '';
     }
   }
-  
+
   private getModelName(endpoint: string): string {
     switch (endpoint) {
       case 'openai':
@@ -86,9 +96,8 @@ export class ApiService {
         return 'default-model';
     }
   }
-  
+
   private getMockResponse(message: string, endpoint: string): Observable<any> {
-   
     let aiName = 'AI';
     switch (endpoint) {
       case 'openai':
@@ -107,7 +116,7 @@ export class ApiService {
         aiName = 'Mistral';
         break;
     }
-    
+
     const responses = [
       `Hello from ${aiName}! I received your message: "${message}"`,
       `This is ${aiName} responding to your question. I'm currently in mock mode.`,
@@ -115,9 +124,8 @@ export class ApiService {
       `Thanks for chatting with ${aiName}! Your message was: "${message}"`,
       `${aiName} is thinking about "${message}". In a real implementation, I would give a more thoughtful response.`
     ];
-    
+
     const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    
     return of({
       response: randomResponse,
       ai: endpoint
